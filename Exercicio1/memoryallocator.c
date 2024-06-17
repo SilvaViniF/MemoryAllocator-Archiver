@@ -11,11 +11,12 @@ struct mem_block {
 };
 #pragma pack(pop)
 
-#define MEMORY_SIZE 1024
-static char memory_pool[MEMORY_SIZE];
+int MEMORY_SIZE = 1024;
+static char memory_pool[1024];
 static struct mem_block *head = NULL;
 
-void init_memory() {
+void init_memory(int maxmemory) {
+    MEMORY_SIZE = maxmemory;
     head = (struct mem_block*)memory_pool;
     head->is_free = 1;
     head->size = MEMORY_SIZE - sizeof(struct mem_block);

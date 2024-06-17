@@ -1,6 +1,6 @@
 
 //Para compilar:
-// gcc -o malloctest malloctest.c memory_allocator.c
+// gcc -o malloctest malloctest.c memoryallocator.c
 
 #include "memoryallocator.h"
 
@@ -31,6 +31,8 @@ int main(int argc, char *argv[]) {
     maxMemory = atoi(argv[1]);
 
     srand(time(NULL));
+
+    init_memory(maxMemory);
 
     while(1){
         if (rand() % 2 == 0 && allocCount < MAX_ALLOCATIONS - 1){

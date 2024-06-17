@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 // Inicializa o pool de memória
-void init_memory(void);
+void init_memory(int maxMemory);
 
 // Aloca um bloco de memória de tamanho `size`
 void* smalloc(size_t size);
