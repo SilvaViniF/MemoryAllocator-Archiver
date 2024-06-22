@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "memoryallocator.h"
+#include <unistd.h>
+#include <stddef.h>
 
 #pragma pack(push, 1)
 struct mem_block {
@@ -11,18 +12,29 @@ struct mem_block {
 };
 #pragma pack(pop)
 
-int MEMORY_SIZE = 1024;
-static char memory_pool[1024];
+#define MEMORY_SIZE 1024
 static struct mem_block *head = NULL;
+static void *initial_break = NULL;
 
-void init_memory(int maxmemory) {
-    MEMORY_SIZE = maxmemory;
-    head = (struct mem_block*)memory_pool;
-    head->is_free = 1;
-    head->size = MEMORY_SIZE - sizeof(struct mem_block);
-    head->mem_ptr = (void*)(memory_pool + sizeof(struct mem_block));
-    head->next = NULL;
-    head->prior = NULL;
+void init_memory(size_t maxmemory) {
+    initial_break = sbrk(0);  // Get the initial program break
+    printf("Initial program break: %p\n", initial_break);
+    
+    void *mem = sbrk(maxmemory);
+    if (mem == (void*)-1) {
+        printf("Error allocating memory\n");
+    } else {
+        void *current_break = sbrk(0);
+        printf("Initial Heap size: %ld bytes\n", (char*)current_break - (char*)initial_break);
+        printf("Allocated %zu bytes of memory\n", maxmemory);
+
+        head = (struct mem_block*)mem;
+        head->is_free = 1;
+        head->size = maxmemory - sizeof(struct mem_block);
+        head->mem_ptr = (void*)((char*)mem + sizeof(struct mem_block));
+        head->next = NULL;
+        head->prior = NULL;
+    }
 }
 
 void* smalloc(size_t size) {
@@ -75,4 +87,24 @@ void sfree(void *ptr) {
         }
         current = current->next;
     }
+}
+
+void check_heap_size() {
+    void *current_break = sbrk(0);  // Get the current program break
+    printf("Final program break: %p\n", current_break);
+    printf("Final Heap size: %ld bytes\n", (char*)current_break - (char*)initial_break);
+}
+
+int main() {
+    init_memory(MEMORY_SIZE);
+    
+    void *p1 = smalloc(100);
+    void *p2 = smalloc(200);
+    
+    sfree(p1);
+    void *p3 = smalloc(50);
+    
+    check_heap_size(); 
+    
+    return 0;
 }
