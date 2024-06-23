@@ -4,7 +4,7 @@
 
 #define MAXNAME 256
 
-#pragma pack(push, 1)
+#pragma pack(push, 1) 
 struct fileheader {
     char name[MAXNAME];      // Nome do arquivo
     unsigned int filesize;   // Tamanho do arquivo em bytes
@@ -24,17 +24,26 @@ void archive_files(const char *output_file, int file_count, char *file_paths[]) 
             perror("Failed to open input file");
             continue;
         }
-
+        //montando header
         struct fileheader header;
         strncpy(header.name, file_paths[i], MAXNAME);
         fseek(input_fp, 0, SEEK_END);
         header.filesize = ftell(input_fp);
         fseek(input_fp, 0, SEEK_SET);
-
+        //escrevendo header na saida
         fwrite(&header, sizeof(struct fileheader), 1, output_fp);
-
+        //lendo conteudo do arquivo
         char *buffer = (char *)malloc(header.filesize);
+        
+        
         fread(buffer, 1, header.filesize, input_fp);
+        //perguntar professor
+        /* for (int j = 0; j < header.filesize; j++) {
+            printf("%c", buffer[j]);
+        }
+        printf("\n"); */
+        //escrevendo conteudo na saida
+
         fwrite(buffer, 1, header.filesize, output_fp);
 
         free(buffer);
@@ -126,7 +135,6 @@ int main(int argc, char **argv) {
         char *output_file = argv[2];
         char **input_files = &argv[3];
         int num_input_files = argc - 3;
-
         printf("Arquivo de saída: %s\n", output_file);
         archive_files(output_file, num_input_files, input_files);
         return 0;

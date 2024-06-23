@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "memoryallocator.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "typeinfo": "c"
     }
 }
