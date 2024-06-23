@@ -15,18 +15,23 @@ struct mem_block {
 #define MEMORY_SIZE 1024
 static struct mem_block *head = NULL;
 static void *initial_break = NULL;
+static void *main_break = NULL;
 
 void init_memory(size_t maxmemory) {
     initial_break = sbrk(0);  // Get the initial program break
     printf("Initial program break: %p\n", initial_break);
     
     void *mem = sbrk(maxmemory);
+
+    printf("program break after allocation: %p\n", mem);
+
     if (mem == (void*)-1) {
         printf("Error allocating memory\n");
     } else {
         void *current_break = sbrk(0);
-        printf("Initial Heap size: %ld bytes\n", (char*)current_break - (char*)initial_break);
-        printf("Allocated %zu bytes of memory\n", maxmemory);
+        
+        printf("Heap size: %ld bytes\n", (char*)current_break - (char*)initial_break);
+        printf("Allocated %ld bytes of memory\n", maxmemory);
 
         head = (struct mem_block*)mem;
         head->is_free = 1;
@@ -42,7 +47,7 @@ void* smalloc(size_t size) {
 
     while (current != NULL) {
         if (current->is_free && current->size >= size) {
-            if (current->size >= size + sizeof(struct mem_block)) {
+            if (current->size >= size + sizeof(struct mem_block)) {//verifica se vai sobrar espaço para um bloco novo
                 struct mem_block *new_block = (struct mem_block*)((char*)current->mem_ptr + size);
                 new_block->is_free = 1;
                 new_block->size = current->size - size - sizeof(struct mem_block);
@@ -65,30 +70,36 @@ void sfree(void *ptr) {
     if (ptr == NULL) return;
 
     struct mem_block *current = head;
+    
 
     while (current != NULL) {
         if (current->mem_ptr == ptr) {
             current->is_free = 1;
-
+            
+            //coalescencia pra tras
             if (current->prior && current->prior->is_free) {
                 current->prior->size += current->size + sizeof(struct mem_block);
                 current->prior->next = current->next;
                 if (current->next) current->next->prior = current->prior;
                 current = current->prior;
             }
-
+            //coalescencia pra frente
             if (current->next && current->next->is_free) {
                 current->size += current->next->size + sizeof(struct mem_block);
                 current->next = current->next->next;
                 if (current->next) current->next->prior = current;
+                
             }
+            
+            
 
             return;
         }
         current = current->next;
     }
+    
 }
-
+/* 
 void check_heap_size() {
     void *current_break = sbrk(0);  // Get the current program break
     printf("Final program break: %p\n", current_break);
@@ -96,15 +107,18 @@ void check_heap_size() {
 }
 
 int main() {
+
+    main_break = sbrk(0);  // Get the mainprogram break
+    printf("Main program break: %p\n", main_break);
+    
+
     init_memory(MEMORY_SIZE);
     
-    void *p1 = smalloc(100);
-    void *p2 = smalloc(200);
+    void *p1 = smalloc(1024);
     
-    sfree(p1);
-    void *p3 = smalloc(50);
-    
-    check_heap_size(); 
+
+    //check_heap_size(); 
     
     return 0;
 }
+ */

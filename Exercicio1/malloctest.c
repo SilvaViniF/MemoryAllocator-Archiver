@@ -44,7 +44,9 @@ int main(int argc, char *argv[]) {
             }
             /* Change malloc() by smalloc() */
             allocations[allocCount].ptr = smalloc(size);
-            allocations[allocCount].size = size;
+            printf("tamanho do bloc: %d\n",allocations[allocCount].size);
+            allocations[allocCount].size = size;printf("tamanho do bloc: %d\n",allocations[allocCount].size);
+            
             currentMemory += size;
             allocCount++;
             printf("Allocated %u bytes, total %u, position %i\n", size, currentMemory, allocCount);
