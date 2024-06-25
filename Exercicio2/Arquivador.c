@@ -37,11 +37,7 @@ void archive_files(const char *output_file, int file_count, char *file_paths[]) 
         
         
         fread(buffer, 1, header.filesize, input_fp);
-        //perguntar professor
-        /* for (int j = 0; j < header.filesize; j++) {
-            printf("%c", buffer[j]);
-        }
-        printf("\n"); */
+
         //escrevendo conteudo na saida
 
         fwrite(buffer, 1, header.filesize, output_fp);

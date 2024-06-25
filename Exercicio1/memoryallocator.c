@@ -19,19 +19,19 @@ static void *main_break = NULL;
 
 void init_memory(size_t maxmemory) {
     initial_break = sbrk(0);  // Get the initial program break
-    printf("Initial program break: %p\n", initial_break);
+    //printf("Initial program break: %p\n", initial_break);
     
     void *mem = sbrk(maxmemory);
 
-    printf("program break after allocation: %p\n", mem);
+    //printf("program break after allocation: %p\n", mem);
 
     if (mem == (void*)-1) {
         printf("Error allocating memory\n");
     } else {
         void *current_break = sbrk(0);
         
-        printf("Heap size: %ld bytes\n", (char*)current_break - (char*)initial_break);
-        printf("Allocated %ld bytes of memory\n", maxmemory);
+        //printf("Heap size: %ld bytes\n", (char*)current_break - (char*)initial_break);
+        //printf("Allocated %ld bytes of memory\n", maxmemory);
 
         head = (struct mem_block*)mem;
         head->is_free = 1;
